@@ -19,6 +19,9 @@ import net.sourceforge.tess4j.Tesseract;
 @RequestMapping("/ocr")
 public class Ocr {
 
+    private final String datapath = "src/main/resources/tessdata";
+    String language = "por";
+
     @PostMapping()
     public ResponseEntity<String> traduzir(@RequestParam(name="file") MultipartFile file) throws Exception{
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -31,10 +34,10 @@ public class Ocr {
             BufferedImage img = ImageIO.read(file.getInputStream());
             Tesseract tesseract = new Tesseract();
             //Path da pasta pai onde fica a pasta "tessdata"
-            tesseract.setDatapath("C:\\Program Files (x86)\\Tesseract-OCR\\tessdata");
+            tesseract.setDatapath(datapath);
             resultado = "";
             //lingua: por, eng etc...
-            tesseract.setLanguage("por");
+            tesseract.setLanguage(language);
             resultado = tesseract.doOCR(img);
         } catch (IOException e) {
             throw new Exception("Erro ao ler arquivo");
