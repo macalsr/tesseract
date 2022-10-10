@@ -31,57 +31,56 @@ public class ImgUtil {
         return image;
     }
 
-    public static MultipartFile validaArquivo(MultipartFile file) {
+    public static BufferedImage validaArquivo(MultipartFile file) throws IOException {
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
         if (!"png".equals(ext) && !"jpg".equals(ext) && !"gif".equals(ext)) {
             throw new ImageErrorException("A extensão do arquivo não é compativel.");
         }
-        return file;
+        return ImageIO.read(file.getInputStream());
     }
 
-    public static String leitorImagem(MultipartFile file) {
+    public static String leitorImagem(BufferedImage img) {
         String text = "";
         try {
-            BufferedImage img = ImageIO.read(file.getInputStream());
             Tesseract tesseract = new Tesseract();
             tesseract.setDatapath(datapath);
             tesseract.setLanguage(language);
             text = tesseract.doOCR(img);
-        } catch (IOException | TesseractException e) {
+        } catch (TesseractException e) {
             throw new ImageErrorException("Erro ao ler arquivo");
         }
         return text;
     }
 
-    public static void cortaImagem(MultipartFile file) throws IOException {
+    public static BufferedImage retiraBorda(BufferedImage file) throws IOException {
+        BufferedImage img = file.getSubimage(115, 80, 965, 1190);
         String outputFiles = "src/main/resources/outputfiles/";
-        List<BufferedImage> sliceOfImages = new ArrayList<>();
-        BufferedImage img = ImageIO.read(file.getInputStream());
-        BufferedImage model = img.getSubimage(0, 0, img.getWidth(), img.getHeight() / 5);
-//        ImageIO.write(model, "png", new File(outputFiles + "imagem1.png"));
-        int orin = img.getHeight();
-        int modelHeight = model.getHeight();
-        sliceOfImages.add(model);
-
-        int slice = 1;
-        while (slice < 5) {
-            BufferedImage picture = img.getSubimage(0, 0, img.getWidth(), img.getHeight() - modelHeight);
-            modelHeight = modelHeight * slice;
-            sliceOfImages.add(picture);
-            ImageIO.write(picture, "png", new File(outputFiles + "imagem" + slice + ".png"));
-            slice++;
-        }
-
-//        BufferedImage image1 = img.getSubimage(0, 0, img.getWidth(), img.getHeight() / 5);
-//        BufferedImage image2 = img.getSubimage(0, 0, img.getWidth() - image1.getWidth(), img.getHeight() / 4);
-//        BufferedImage image3 = img.getSubimage(0, 0, img.getWidth() - image2.getWidth(), img.getHeight() / 3);
-//        BufferedImage image4 = img.getSubimage(0, 0, img.getWidth() - image3.getWidth(), img.getHeight() / 2);
-//        BufferedImage image5 = img.getSubimage(0, 0, img.getWidth() - image4.getWidth(), img.getHeight() / 1);
-//        images.add(image1);
-//        images.add(image2);
-//        images.add(image3);
-//        images.add(image4);
-//        images.add(image5);
+        ImageIO.write(img, "png", new File(outputFiles + "imagem1.png"));
+        return img;
     }
 
+    public static String coletaInformacoes(BufferedImage img) throws IOException {
+        List<String> info = new ArrayList<>();
+
+        //Número da Nota
+        BufferedImage numeroNota = img.getSubimage(767, 4, 161, 41);
+
+        //Código de Verificação
+        BufferedImage codigoDeVerificacao = img.getSubimage(767, 89, 161, 38);
+
+        //Prestador de serviços
+        BufferedImage prestadorServiços = img.getSubimage(117, 135, 725, 117);
+
+        //Serve somente para demostração, não faz diferença
+        String outputFiles = "src/main/resources/outputfiles/";
+        ImageIO.write(numeroNota, "png", new File(outputFiles + "imagem2.png"));
+        ImageIO.write(codigoDeVerificacao, "png", new File(outputFiles + "imagem3.png"));
+        ImageIO.write(prestadorServiços, "png", new File(outputFiles + "imagem4.png"));
+
+        info.add(leitorImagem(numeroNota));
+        info.add(leitorImagem(codigoDeVerificacao));
+        info.add(leitorImagem(prestadorServiços));
+
+        return info.toString();
+    }
 }
