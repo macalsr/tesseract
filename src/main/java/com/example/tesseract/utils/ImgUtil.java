@@ -11,10 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ImgUtil {
+    public static final Pattern REGEX_NAO_DIGITO = Pattern.compile("\\D");
+
     private ImgUtil() {
     }
     private static final String datapath = "src/main/resources/tessdata";
@@ -75,23 +79,38 @@ public class ImgUtil {
         return convert2GreyScale(img);
     }
 
+    public static String removeNaoDigitos(String input) {
+        return input.replaceAll(REGEX_NAO_DIGITO.pattern(), "");
+    }
+
     public static String coletaInformacoes(BufferedImage img) {
-        List<String> info = new ArrayList<>();
+        Map<String, String> info = new HashMap<>();
 
-        //Número da Nota
-        BufferedImage numeroNota = img.getSubimage(767, 4, 161, 41);
+        info.put("Nome Prefeitura", leitorImagem(convert2GreyScale(img.getSubimage(256,84, 599,32))));
 
-        //Código de Verificação
-        BufferedImage codigoDeVerificacao = img.getSubimage(767, 89, 161, 38);
+        info.put("Número da Nota", leitorImagem(convert2GreyScale(img.getSubimage(879,99, 193,24))));
+        info.put("Data da Emissão", leitorImagem(convert2GreyScale(img.getSubimage(880,142, 233,23))));
+        info.put("Código verificação", leitorImagem(convert2GreyScale(img.getSubimage(880,186, 207,22))));
+        info.put("CNPJ Prestador", removeNaoDigitos(leitorImagem(convert2GreyScale(img.getSubimage(316,237, 165,26)))));
+        info.put("Razão Social Prestador", leitorImagem(convert2GreyScale(img.getSubimage(376,259, 268,24))));
+        info.put("Endereço Prestador", leitorImagem(convert2GreyScale(img.getSubimage(309,281, 646,24))));
+        info.put("Município Prestador", leitorImagem(convert2GreyScale(img.getSubimage(307,302, 156,37))));
+        info.put("UF Prestador", leitorImagem(convert2GreyScale(img.getSubimage(706,301, 48,28))).toUpperCase());
+        info.put("Inscrição municipal", leitorImagem(convert2GreyScale(img.getSubimage(823,231, 100,36))));
 
-        //Prestador de serviços
-        BufferedImage prestadorServicos = img.getSubimage(117, 135, 725, 117);
+        info.put("Razão Social Tomador", leitorImagem(convert2GreyScale(img.getSubimage(269,367, 223,30))));
+        info.put("CNPJ Tomador", removeNaoDigitos(leitorImagem(convert2GreyScale(img.getSubimage(210,393, 165,25)))));
+        info.put("Endereço Tomador", leitorImagem(convert2GreyScale(img.getSubimage(200,412, 752,29))));
+        info.put("Município Tomador", leitorImagem(convert2GreyScale(img.getSubimage(201,437, 83,22))));
+        info.put("UF Tomador", leitorImagem(convert2GreyScale(img.getSubimage(536,435, 38,24))));
+        info.put("Discriminação do Serviço", leitorImagem(convert2GreyScale(img.getSubimage(119,540, 871,76))));
+        info.put("Valor do Serviço", leitorImagem(convert2GreyScale(img.getSubimage(712,973, 115,26))));
+        info.put("Código do Serviço", leitorImagem(convert2GreyScale(img.getSubimage(117,1056, 49,20))));
+        info.put("Base de Calculo", leitorImagem(convert2GreyScale(img.getSubimage(438,1097, 68,18))));
+        info.put("Alíquota", leitorImagem(convert2GreyScale(img.getSubimage(594,1097, 36,17))));
+        info.put("Valor ISS", leitorImagem(convert2GreyScale(img.getSubimage(829,1098, 44,17))));
+        info.put("Outras Informações", leitorImagem(convert2GreyScale(img.getSubimage(117,1056, 957,67))));
 
-        //Serve somente para demostração, não faz diferença
-        info.add(leitorImagem(numeroNota));
-        info.add(leitorImagem(codigoDeVerificacao));
-        info.add(leitorImagem(prestadorServicos));
-
-        return info.toString();
+        return info.toString().replaceAll("=", " = ");
     }
 }

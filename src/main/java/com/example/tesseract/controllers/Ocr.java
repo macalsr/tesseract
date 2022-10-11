@@ -16,7 +16,7 @@ public class Ocr {
 
     @PostMapping()
     public ResponseEntity<String> converte(@RequestParam(name = "file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok(ImgUtil.coletaInformacoes(ImgUtil.retiraBorda(ImgUtil.validaArquivo(file))));
+        return ResponseEntity.ok(ImgUtil.coletaInformacoes((ImgUtil.validaArquivo(file))));
     }
 
 }
