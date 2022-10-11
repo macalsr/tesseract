@@ -10,31 +10,27 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImgUtil {
-
-    private static final String resourcesDataPath = "src/main/resources/test-data";
-    private static String datapath = "src/main/resources/tessdata";
-    private static final String language = "por";
-
-    public static BufferedImage convertPdf2Image(File file) throws IOException {
-        PDDocument doc = PDDocument.load(new FileInputStream(file));
-        List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
-        String fileName = file.getName().replace(".pdf", "");
-        BufferedImage image = pages.get(0).convertToImage();
-        ImageIO.write(image, "png", new File(resourcesDataPath + "output" + ".png"));
-        return image;
+    private ImgUtil() {
     }
+    private static final String datapath = "src/main/resources/tessdata";
+    private static final String language = "por";
 
     public static BufferedImage validaArquivo(MultipartFile file) throws IOException {
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
         if (!"png".equals(ext) && !"jpg".equals(ext) && !"gif".equals(ext)) {
-            throw new ImageErrorException("A extensão do arquivo não é compativel.");
+            if("pdf".equals(ext)){
+                PDDocument document = PDDocument.load(file.getInputStream());
+                List<PDPage> list = document.getDocumentCatalog().getAllPages();
+                BufferedImage image = list.get(0).convertToImage();
+                document.close();
+                return image;
+            }
+            throw new ImageErrorException("Formato de arquivo inválido");
         }
         return ImageIO.read(file.getInputStream());
     }
@@ -52,7 +48,7 @@ public class ImgUtil {
         return text;
     }
 
-    public static BufferedImage convert2GreyScale(BufferedImage img) throws IOException {
+    public static BufferedImage convert2GreyScale(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
 
@@ -74,14 +70,12 @@ public class ImgUtil {
         return img;
     }
 
-    public static BufferedImage retiraBorda(BufferedImage file) throws IOException {
+    public static BufferedImage retiraBorda(BufferedImage file) {
         BufferedImage img = file.getSubimage(115, 80, 965, 1190);
-        String outputFiles = "src/main/resources/outputfiles/";
-        ImageIO.write(img, "png", new File(outputFiles + "imagem1.png"));
         return convert2GreyScale(img);
     }
 
-    public static String coletaInformacoes(BufferedImage img) throws IOException {
+    public static String coletaInformacoes(BufferedImage img) {
         List<String> info = new ArrayList<>();
 
         //Número da Nota
@@ -94,11 +88,6 @@ public class ImgUtil {
         BufferedImage prestadorServicos = img.getSubimage(117, 135, 725, 117);
 
         //Serve somente para demostração, não faz diferença
-        String outputFiles = "src/main/resources/outputfiles/";
-        ImageIO.write(numeroNota, "png", new File(outputFiles + "imagem2.png"));
-        ImageIO.write(codigoDeVerificacao, "png", new File(outputFiles + "imagem3.png"));
-        ImageIO.write(prestadorServicos, "png", new File(outputFiles + "imagem4.png"));
-
         info.add(leitorImagem(numeroNota));
         info.add(leitorImagem(codigoDeVerificacao));
         info.add(leitorImagem(prestadorServicos));

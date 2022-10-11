@@ -31,7 +31,7 @@ public class ConvertPDFPagesToImages {
                 String fileName = sourceFile.getName().replace(".pdf", "");
                 int pageNumber = 1;
                 for (PDPage page : list) {
-                    BufferedImage image = page.convertToImage();
+                    BufferedImage image = page.convertToImage().getSubimage(0, 0, 2000, 3000);
                     File outputfile = new File(destinationDir + fileName + "_" + pageNumber + ".png");
                     System.out.println("Image Created -> " + outputfile.getName());
                     ImageIO.write(image, "png", outputfile);
