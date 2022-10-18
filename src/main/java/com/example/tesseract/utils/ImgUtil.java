@@ -1,7 +1,6 @@
 package com.example.tesseract.utils;
 
 import com.example.tesseract.exception.ImageErrorException;
-import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.apache.commons.io.FilenameUtils;
@@ -11,17 +10,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class ImgUtil {
-    public static final Pattern REGEX_NAO_DIGITO = Pattern.compile("\\D");
+
+    private static final Pattern REGEX_QUEBRA_LINHA = Pattern.compile("\\n");
     private static final String datapath = "src/main/resources/tessdata";
-    public static final String output = "src/main/resources/outputfiles/";
-    private static final String language = "por";
-    private static ITessAPI.TessBaseAPI handle;
 
     public static BufferedImage validaArquivo(MultipartFile file) throws IOException {
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -29,8 +25,9 @@ public class ImgUtil {
             if ("pdf".equals(ext)) {
                 PDDocument document = PDDocument.load(file.getInputStream());
                 List<PDPage> list = document.getDocumentCatalog().getAllPages();
-                BufferedImage image = list.get(0).convertToImage(BufferedImage.TYPE_INT_RGB, 300);
-                ImageIO.write(image, "png", new File(output + "imagem.png"));
+                BufferedImage image = list.get(0).convertToImage(BufferedImage.TYPE_INT_RGB, 200);
+                //Serve como teste, basta criar o dir "output" e a imagem é gravada lá
+                //ImageIO.write(image, "png", new File(output + "imagem.png"));
                 document.close();
                 return image;
             }
@@ -39,21 +36,13 @@ public class ImgUtil {
         return ImageIO.read(file.getInputStream());
     }
 
-    public static String leitorImagem(BufferedImage img) {
+    public static String leitorImagem(BufferedImage img, String language) {
         String text = "";
         try {
             Tesseract tesseract = new Tesseract();
             tesseract.setDatapath(datapath);
             tesseract.setLanguage(language);
-//            ITessAPI.TessResultIterator ri = TessAPI1.TessBaseAPIGetIterator(handle);
-//            ITessAPI.TessPageIterator pi = TessAPI1.TessResultIteratorGetPageIterator(ri);
-//            int level = ITessAPI.TessPageIteratorLevel.RIL_WORD;
             text = tesseract.doOCR(img);
-//            do {
-//                float confidence = TessAPI1.TessResultIteratorConfidence(ri, level);
-//            } while (TessAPI1.TessPageIteratorNext(pi, level) == TRUE);
-////        TessAPI1.TessPageIteratorDelete(pi);
-//            TessAPI1.TessResultIteratorDelete(ri);
         } catch (TesseractException e) {
             throw new ImageErrorException("Erro ao ler arquivo");
         }
@@ -82,8 +71,17 @@ public class ImgUtil {
         return img;
     }
 
-    public static String removeNaoDigitos(String input) {
-        return input.replaceAll(REGEX_NAO_DIGITO.pattern(), "");
+    public static String removeQuebraLinha(String input) {
+        return input.replaceAll(REGEX_QUEBRA_LINHA.pattern(), "");
+    }
+
+    public static BufferedImage calcularCoordenas(BufferedImage img, int x, int y, int w, int h) {
+        return img.getSubimage(
+                img.getWidth() * x / img.getWidth(),
+                img.getHeight() * y / img.getHeight(),
+                img.getWidth() * w / img.getWidth(),
+                img.getHeight() * h / img.getHeight()
+        );
     }
 
 }
