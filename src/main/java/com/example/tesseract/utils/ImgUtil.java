@@ -1,6 +1,6 @@
 package com.example.tesseract.utils;
 
-import com.example.tesseract.exception.ImageErrorException;
+import com.example.tesseract.domain.exceptions.ImageErrorException;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.apache.commons.io.FilenameUtils;
@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -18,6 +19,7 @@ public class ImgUtil {
 
     private static final Pattern REGEX_QUEBRA_LINHA = Pattern.compile("\\n");
     private static final String datapath = "src/main/resources/tessdata";
+    private static final String output = "src/test/resources/outputfiles/";
 
     public static BufferedImage validaArquivo(MultipartFile file) throws IOException {
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -25,7 +27,7 @@ public class ImgUtil {
             if ("pdf".equals(ext)) {
                 PDDocument document = PDDocument.load(file.getInputStream());
                 List<PDPage> list = document.getDocumentCatalog().getAllPages();
-                BufferedImage image = list.get(0).convertToImage(BufferedImage.TYPE_INT_RGB, 200);
+                BufferedImage image = conversorImagem(list);
                 //Serve como teste, basta criar o dir "output" e a imagem é gravada lá
                 //ImageIO.write(image, "png", new File(output + "imagem.png"));
                 document.close();
@@ -34,6 +36,10 @@ public class ImgUtil {
             throw new ImageErrorException("Formato de arquivo inválido");
         }
         return ImageIO.read(file.getInputStream());
+    }
+
+    public static BufferedImage conversorImagem(List<PDPage> list) throws IOException {
+        return list.get(0).convertToImage(BufferedImage.TYPE_INT_RGB, 300);
     }
 
     public static String leitorImagem(BufferedImage img, String language) {
@@ -75,13 +81,15 @@ public class ImgUtil {
         return input.replaceAll(REGEX_QUEBRA_LINHA.pattern(), "");
     }
 
-    public static BufferedImage calcularCoordenas(BufferedImage img, int x, int y, int w, int h) {
-        return img.getSubimage(
-                img.getWidth() * x / img.getWidth(),
-                img.getHeight() * y / img.getHeight(),
-                img.getWidth() * w / img.getWidth(),
-                img.getHeight() * h / img.getHeight()
+    public static BufferedImage calcularCoordenadas(BufferedImage img, double x, double y, double w, double h) throws IOException {
+        BufferedImage img2 =  img.getSubimage(
+                (int) ((x / 2479) * img.getWidth()),
+                (int) ((y / 3508) * img.getHeight()),
+                (int) ((w / 2479) * img.getWidth()),
+                (int) ((h / 3508) * img.getHeight())
         );
+        ImageIO.write(img2, "png", new File(output + "imagem.png"));
+        return img2;
     }
 
 }

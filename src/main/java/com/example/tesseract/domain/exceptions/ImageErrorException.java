@@ -1,4 +1,4 @@
-package com.example.tesseract.exception;
+package com.example.tesseract.domain.exceptions;
 
 public class ImageErrorException extends RuntimeException {
 
