@@ -3,14 +3,14 @@ package com.example.tesseract.domain.conversores.img.sp;
 import com.example.tesseract.domain.model.NFSe;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class ConversorImgParaLayoutUnicoImgTxtSaoPaulo {
 
-    public static NFSe converte(BufferedImage img) {
+    public static NFSe converte(BufferedImage img) throws IOException {
         NotaFiscalSaoPaulo notaFiscalSaoPaulo = new NotaFiscalSpImgToTxt(img);
         NFSe nfse = new NFSe();
 
-        //Dados Prefeitura e NFSe
         nfse.setNomePrefeitura(notaFiscalSaoPaulo.nomePrefeitura());
         nfse.setDataEmissao(notaFiscalSaoPaulo.dataEmissao());
         nfse.setNumeroNota(notaFiscalSaoPaulo.numeroNota());
@@ -18,7 +18,6 @@ public class ConversorImgParaLayoutUnicoImgTxtSaoPaulo {
         nfse.setNumeroRps(notaFiscalSaoPaulo.numeroRps());
         nfse.setSerieRps(notaFiscalSaoPaulo.serieRps());
 
-        //Prestador
         nfse.setRazaoSocialPrestador(notaFiscalSaoPaulo.razaoSocialPrestador());
         nfse.setCpnjPrestador(notaFiscalSaoPaulo.cnpjPrestador());
         nfse.setEnderecoPrestador(notaFiscalSaoPaulo.enderecoPrestador());
@@ -26,7 +25,6 @@ public class ConversorImgParaLayoutUnicoImgTxtSaoPaulo {
         nfse.setMunicipioPrestador(notaFiscalSaoPaulo.municipioPrestador());
         nfse.setInscricaoMunicipalPrestador(notaFiscalSaoPaulo.inscricaoMunicipalPrestador());
 
-        //Tomador
         nfse.setRazaoSocialTomador(notaFiscalSaoPaulo.razaoSocialTomador());
         nfse.setEnderecoTomador(notaFiscalSaoPaulo.enderecoTomador());
         nfse.setCnpjTomador(notaFiscalSaoPaulo.cnpjTomador());
@@ -34,7 +32,6 @@ public class ConversorImgParaLayoutUnicoImgTxtSaoPaulo {
         nfse.setMunicipioTomador(notaFiscalSaoPaulo.municipioTomador());
         nfse.setInscricaoMunicipalTomador(notaFiscalSaoPaulo.inscricaoMunicipalTomador());
 
-        //Valores
         nfse.setValorServico(notaFiscalSaoPaulo.valorServico());
         nfse.setBaseCalculo(notaFiscalSaoPaulo.baseCalculo());
         nfse.setAliquota(notaFiscalSaoPaulo.aliquota());
@@ -45,7 +42,6 @@ public class ConversorImgParaLayoutUnicoImgTxtSaoPaulo {
         nfse.setValorInss(notaFiscalSaoPaulo.valorInss());
         nfse.setValorPisPasep(notaFiscalSaoPaulo.valorPisPasep());
 
-        //Servico
         nfse.setCodigoServico(notaFiscalSaoPaulo.codigoServico());
         nfse.setDiscriminacao(notaFiscalSaoPaulo.discriminacao());
 

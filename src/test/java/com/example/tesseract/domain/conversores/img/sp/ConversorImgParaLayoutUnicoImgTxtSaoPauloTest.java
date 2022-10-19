@@ -21,7 +21,6 @@ class ConversorImgParaLayoutUnicoImgTxtSaoPauloTest {
 
     private ConversorImgParaLayoutUnicoImgTxtSaoPaulo conversorImgParaLayoutUnicoImgTxtSaoPaulo;
     private BufferedImage img;
-
     private NFSe nfse;
 
     @BeforeEach
@@ -35,12 +34,8 @@ class ConversorImgParaLayoutUnicoImgTxtSaoPauloTest {
     }
 
     @Test
-    void nomePrefeitura() {
-        assertEquals("PREFEITURA DO MUNICÍPIO DE SÃO PAULO", nfse.getNomePrefeitura());
-    }
-
-    @Test
     void informacoesNotaFiscal() {
+        assertEquals("PREFEITURA DO MUNICÍPIO DE SÃO PAULO", nfse.getNomePrefeitura());
         assertEquals(507403L, nfse.getNumeroNota());
         assertEquals(593874L, nfse.getNumeroRps());
         assertEquals("S", nfse.getSerieRps());
