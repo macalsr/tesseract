@@ -1,4 +1,4 @@
-package com.example.tesseract;
+package com.example.tesseract.utils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -10,7 +10,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 
 @SuppressWarnings("unchecked")
-public class ConvertPDFPagesToImages {
+public class PdfUtil {
     public static void main(String[] args) {
         try {
             String sourceDir = "C:/tmp/DVARLVN-5863-TERESINA.pdf"; // Pdf files are read from this folder
